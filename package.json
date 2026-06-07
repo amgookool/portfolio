@@ -14,7 +14,11 @@
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --check .",
-    "deploy": "pnpm build && firebase deploy --only hosting"
+    "emulate": "firebase emulators:start",
+    "emulator:save": "firebase emulators:export ./firebase-export",
+    "deploy": "pnpm build && firebase deploy --only hosting",
+    "deploy:extensions": "firebase deploy --only extensions",
+    "deploy:firestore-indexes": "firebase deploy --only firestore:indexes"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
