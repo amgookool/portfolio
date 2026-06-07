@@ -16,10 +16,31 @@ import {
 } from 'lucide-react'
 import HeroCanvas from '#/components/HeroCanvas'
 import ScrollReveal from '#/components/ScrollReveal'
+import { firestore as db } from '@/utils/firebase'
+import {
+  addDoc,
+  collection,
+  FirestoreError,
+  Timestamp,
+} from 'firebase/firestore'
 
 export const Route = createFileRoute('/')({ component: App })
 
 // ── data ─────────────────────────────────────────────────────────────────────
+
+type ContactFormData = {
+  name: string
+  email: string
+  message: string
+}
+
+type FireStoreMailData = {
+  to: string
+  message: {
+    subject: string
+    html: string
+  }
+}
 
 const stats: {
   value: string
@@ -46,7 +67,17 @@ const jobs: {
     location: 'Port-of-Spain, Trinidad',
     description:
       'Collaborating with cross-functional teams to design, develop, and maintain secure, high-performance health services. Architecting robust backend modules, conducting code reviews, and automating operational workflows with AI tooling.',
-    tech: ['Node.js', 'Express', 'SvelteKit', 'React', 'Flutter', 'Firebase', 'GCP', 'Docker', 'GitHub Actions'],
+    tech: [
+      'Node.js',
+      'Express',
+      'SvelteKit',
+      'React',
+      'Flutter',
+      'Firebase',
+      'GCP',
+      'Docker',
+      'GitHub Actions',
+    ],
   },
   {
     company: 'Agostini Innovation Lab',
@@ -55,7 +86,15 @@ const jobs: {
     location: 'Aranguez, Trinidad',
     description:
       'Developed and optimised the primary client data dashboard, achieving significantly faster load times. Refactored legacy codebase layouts into modern, reusable components with complete state coordination across Svelte and React codebases.',
-    tech: ['SvelteKit', 'React', 'Flutter', 'Tailwind CSS', 'Firebase', 'GCP', 'Figma'],
+    tech: [
+      'SvelteKit',
+      'React',
+      'Flutter',
+      'Tailwind CSS',
+      'Firebase',
+      'GCP',
+      'Figma',
+    ],
   },
   {
     company: 'Mondeum Internal Service Center',
@@ -64,7 +103,15 @@ const jobs: {
     location: 'Port-of-Spain, Trinidad',
     description:
       'Engineered system automation scripts to eliminate repetitive workflow overhead. Modified legacy structures to adapt to new APIs, troubleshoot databases, and maintain core Spring Boot applications.',
-    tech: ['Java', 'Spring Boot', 'PostgreSQL', 'MongoDB', 'Angular', 'TypeScript', 'AWS'],
+    tech: [
+      'Java',
+      'Spring Boot',
+      'PostgreSQL',
+      'MongoDB',
+      'Angular',
+      'TypeScript',
+      'AWS',
+    ],
   },
 ]
 
@@ -76,17 +123,48 @@ const skillGroups: {
   {
     label: 'Languages',
     icon: Code2,
-    items: ['TypeScript', 'JavaScript', 'Java', 'Dart', 'Python', 'SQL / NoSQL', 'C / C++', 'Rust', 'Bash'],
+    items: [
+      'TypeScript',
+      'JavaScript',
+      'Java',
+      'Dart',
+      'Python',
+      'SQL / NoSQL',
+      'C / C++',
+      'Rust',
+      'Bash',
+    ],
   },
   {
     label: 'Frameworks & Libraries',
     icon: Cpu,
-    items: ['Node.js', 'Express', 'SvelteKit', 'React', 'Angular', 'Spring Boot', 'Flutter', 'Tailwind CSS', 'jQuery', 'Thymeleaf'],
+    items: [
+      'Node.js',
+      'Express',
+      'SvelteKit',
+      'React',
+      'Angular',
+      'Spring Boot',
+      'Flutter',
+      'Tailwind CSS',
+      'jQuery',
+      'Thymeleaf',
+    ],
   },
   {
     label: 'Infrastructure & Cloud',
     icon: Layers,
-    items: ['Docker', 'GCP', 'AWS', 'Firebase', 'Firestore', 'PostgreSQL', 'MongoDB', 'GitHub Actions', 'Git'],
+    items: [
+      'Docker',
+      'GCP',
+      'AWS',
+      'Firebase',
+      'Firestore',
+      'PostgreSQL',
+      'MongoDB',
+      'GitHub Actions',
+      'Git',
+    ],
   },
 ]
 
@@ -129,6 +207,39 @@ const projects: {
     thumb: 'ttt',
   },
 ]
+
+// ── Handlers ─────────────────────────────────────────────────────────────────────
+
+async function handleContactFormSubmit(formData: ContactFormData) {
+  try {
+    const writeData = {
+      ...formData,
+      created_at: Timestamp.now(),
+      read_at: null,
+    }
+
+    const sendTo: FireStoreMailData = {
+      to: 'amgookool@hotmail.com',
+      message: {
+        subject: `New Portfolio Contact Form Submission from ${formData.name}`,
+        html: `
+          <p>You have received a new message from your portfolio contact form:</p>
+          <p><strong>Name:</strong> ${formData.name}</p>
+          <p><strong>Email:</strong> ${formData.email}</p>
+          <p><strong>Message:</strong> ${formData.message}</p>
+              `,
+      },
+    }
+
+    await addDoc(collection(db, 'portfolio-requests'), writeData);
+    await addDoc(collection(db, 'portfolio-mail'), sendTo);
+    return
+  } catch (error) {
+    if (error instanceof FirestoreError) {
+      console.error('Firestore error:', error.code, error.message)
+    }
+  }
+}
 
 // ── project thumbnail components ──────────────────────────────────────────────
 
@@ -182,16 +293,30 @@ function ThumbTtt() {
   )
 }
 
-const thumbComponents = { portfolio: ThumbPortfolio, pong: ThumbPong, ttt: ThumbTtt }
+const thumbComponents = {
+  portfolio: ThumbPortfolio,
+  pong: ThumbPong,
+  ttt: ThumbTtt,
+}
 
 // ── small shared components ───────────────────────────────────────────────────
 
-function FilterBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function FilterBtn({
+  label,
+  active,
+  onClick,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+}) {
   return (
     <button
       onClick={onClick}
       className={`rounded-lg px-3 py-1.5 text-xs font-bold capitalize transition ${
-        active ? 'bg-(--lagoon) text-white shadow-sm' : 'text-(--sea-ink-soft) hover:text-(--sea-ink)'
+        active
+          ? 'bg-(--lagoon) text-white shadow-sm'
+          : 'text-(--sea-ink-soft) hover:text-(--sea-ink)'
       }`}
     >
       {label}
@@ -201,17 +326,30 @@ function FilterBtn({ label, active, onClick }: { label: string; active: boolean;
 
 function Section({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-24 border-b border-(--line) py-16 sm:py-24">
+    <section
+      id={id}
+      className="scroll-mt-24 border-b border-(--line) py-16 sm:py-24"
+    >
       <div className="page-wrap px-4">{children}</div>
     </section>
   )
 }
 
-function SectionHeader({ eyebrow, title, className }: { eyebrow: string; title: string; className?: string }) {
+function SectionHeader({
+  eyebrow,
+  title,
+  className,
+}: {
+  eyebrow: string
+  title: string
+  className?: string
+}) {
   return (
     <div className={`mb-10 ${className}`}>
       <p className="island-kicker mb-2">{eyebrow}</p>
-      <h2 className="display-title text-3xl font-bold text-(--sea-ink) sm:text-4xl">{title}</h2>
+      <h2 className="display-title text-3xl font-bold text-(--sea-ink) sm:text-4xl">
+        {title}
+      </h2>
     </div>
   )
 }
@@ -223,11 +361,15 @@ function App() {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
-  const filtered = activeFilter === 'all' ? projects : projects.filter((p) => p.category === activeFilter)
+  const filtered =
+    activeFilter === 'all'
+      ? projects
+      : projects.filter((p) => p.category === activeFilter)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     if (formData.name && formData.email && formData.message) {
+      await handleContactFormSubmit(formData)
       setFormSubmitted(true)
       setFormData({ name: '', email: '', message: '' })
     }
@@ -242,7 +384,10 @@ function App() {
         {/* fade-out at bottom so stats bar reads clearly */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-52"
-          style={{ background: 'linear-gradient(to bottom, transparent, var(--bg-base))' }}
+          style={{
+            background:
+              'linear-gradient(to bottom, transparent, var(--bg-base))',
+          }}
         />
 
         {/* main content */}
@@ -262,14 +407,20 @@ function App() {
             {/* headline */}
             <h1 className="display-title text-5xl font-extrabold leading-[1.04] tracking-tight text-(--sea-ink) sm:text-6xl lg:text-7xl">
               Building scalable systems,{' '}
-              <span className="text-(--lagoon-deep)">architecting solid products.</span>
+              <span className="text-(--lagoon-deep)">
+                architecting solid products.
+              </span>
             </h1>
 
             {/* lead text */}
             <p className="max-w-[54ch] text-lg leading-relaxed text-(--sea-ink-soft) pt-4">
-              Hi, I&rsquo;m Adrian — a Software Engineer specializing in backend architecture, frontend UX,
-              and systems engineering. Currently crafting health-tech software at{' '}
-              <span className="font-semibold text-(--sea-ink)">Dolphin Health</span>.
+              Hi, I&rsquo;m Adrian — a Software Engineer specializing in backend
+              architecture, frontend UX, and systems engineering. Currently
+              crafting health-tech software at{' '}
+              <span className="font-semibold text-(--sea-ink)">
+                Dolphin Health
+              </span>
+              .
             </p>
 
             {/* CTAs + socials */}
@@ -295,7 +446,13 @@ function App() {
                   aria-label="GitHub"
                   className="flex h-10 w-10 items-center justify-center rounded-xl border border-(--line) bg-(--chip-bg) text-(--sea-ink-soft) transition hover:border-(--lagoon) hover:text-(--lagoon)"
                 >
-                  <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
                   </svg>
                 </a>
@@ -306,7 +463,13 @@ function App() {
                   aria-label="LinkedIn"
                   className="flex h-10 w-10 items-center justify-center rounded-xl border border-(--line) bg-(--chip-bg) text-(--sea-ink-soft) transition hover:border-(--lagoon) hover:text-(--lagoon)"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                 </a>
@@ -320,9 +483,16 @@ function App() {
           <ScrollReveal delay={200}>
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-(--line) bg-(--line) sm:grid-cols-4">
               {stats.map((s) => (
-                <div key={s.label} className="cursor-default bg-(--surface) px-6 py-5 transition hover:bg-(--surface2)">
-                  <p className="display-title text-4xl font-extrabold tracking-tight text-(--sea-ink)">{s.value}</p>
-                  <p className="mt-1 text-xs font-medium text-(--sea-ink-soft)">{s.label}</p>
+                <div
+                  key={s.label}
+                  className="cursor-default bg-(--surface) px-6 py-5 transition hover:bg-(--surface2)"
+                >
+                  <p className="display-title text-4xl font-extrabold tracking-tight text-(--sea-ink)">
+                    {s.value}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-(--sea-ink-soft)">
+                    {s.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -343,22 +513,32 @@ function App() {
       <Section id="about">
         <div className="grid gap-12 md:grid-cols-3 md:gap-16">
           <ScrollReveal className="md:col-span-2 space-y-6">
-            <SectionHeader eyebrow="Biography" title="Passionate about clean architecture & systems design." className='pb-2.5'/>
+            <SectionHeader
+              eyebrow="Biography"
+              title="Passionate about clean architecture & systems design."
+              className="pb-2.5"
+            />
             <p className="text-base leading-relaxed text-(--sea-ink-soft)">
-              I am a passionate software engineer dedicated to building scalable, efficient, and reliable
-              software solutions. With experience across the full stack — from backend services in Node.js
-              and Spring Boot to modern frontend frameworks like React, Svelte, and Angular — I enjoy taking
-              ideas from concept to production.
+              I am a passionate software engineer dedicated to building
+              scalable, efficient, and reliable software solutions. With
+              experience across the full stack — from backend services in
+              Node.js and Spring Boot to modern frontend frameworks like React,
+              Svelte, and Angular — I enjoy taking ideas from concept to
+              production.
             </p>
             <p className="text-base leading-relaxed text-(--sea-ink-soft)">
-              My professional philosophy is rooted in code quality, maintainability, and elegant architecture.
-              I believe that writing code is only a part of software engineering; designing systems that can
-              grow, adapt, and handle loads gracefully is where the true value lies.
+              My professional philosophy is rooted in code quality,
+              maintainability, and elegant architecture. I believe that writing
+              code is only a part of software engineering; designing systems
+              that can grow, adapt, and handle loads gracefully is where the
+              true value lies.
             </p>
             <p className="text-base leading-relaxed text-(--sea-ink-soft)">
-              As a lifelong learner, I am constantly exploring the ever-evolving landscapes of technology,
-              including AI agentic workflows and modern containerization. I thrive in collaborative,
-              cross-functional team environments where we build premium user experiences together.
+              As a lifelong learner, I am constantly exploring the ever-evolving
+              landscapes of technology, including AI agentic workflows and
+              modern containerization. I thrive in collaborative,
+              cross-functional team environments where we build premium user
+              experiences together.
             </p>
           </ScrollReveal>
 
@@ -366,10 +546,28 @@ function App() {
             <div className="island-shell rounded-2xl p-6">
               <p className="island-kicker mb-4">Quick Facts</p>
               {[
-                { label: 'Location', value: 'St. Augustine, T&T', icon: MapPin },
-                { label: 'Email', value: 'amgookool@gmail.com', href: 'mailto:amgookool@gmail.com', icon: Mail },
-                { label: 'Phone', value: '+1 (868) 475-5372', href: 'tel:+18684755372', icon: Phone },
-                { label: 'Work mode', value: 'Remote & On-site', icon: Briefcase },
+                {
+                  label: 'Location',
+                  value: 'St. Augustine, T&T',
+                  icon: MapPin,
+                },
+                {
+                  label: 'Email',
+                  value: 'amgookool@gmail.com',
+                  href: 'mailto:amgookool@gmail.com',
+                  icon: Mail,
+                },
+                {
+                  label: 'Phone',
+                  value: '+1 (868) 475-5372',
+                  href: 'tel:+18684755372',
+                  icon: Phone,
+                },
+                {
+                  label: 'Work mode',
+                  value: 'Remote & On-site',
+                  icon: Briefcase,
+                },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -379,13 +577,20 @@ function App() {
                     <item.icon className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-(--sea-ink-soft)">{item.label}</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-(--sea-ink-soft)">
+                      {item.label}
+                    </p>
                     {'href' in item && item.href ? (
-                      <a href={item.href} className="text-sm font-medium text-(--sea-ink) transition hover:text-(--lagoon-deep)">
+                      <a
+                        href={item.href}
+                        className="text-sm font-medium text-(--sea-ink) transition hover:text-(--lagoon-deep)"
+                      >
                         {item.value}
                       </a>
                     ) : (
-                      <p className="text-sm font-medium text-(--sea-ink)">{item.value}</p>
+                      <p className="text-sm font-medium text-(--sea-ink)">
+                        {item.value}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -398,17 +603,27 @@ function App() {
       {/* ══ EXPERIENCE ═══════════════════════════════════════════════════ */}
       <Section id="experience">
         <ScrollReveal>
-          <SectionHeader eyebrow="Career Journey" title="Work Experience" className='pb-4'/>
+          <SectionHeader
+            eyebrow="Career Journey"
+            title="Work Experience"
+            className="pb-4"
+          />
         </ScrollReveal>
 
         <div className="mt-12 border-l border-(--line) pl-10">
           {jobs.map((job, i) => (
-            <ScrollReveal key={job.company} delay={i * 80} className="pb-12 last:pb-0">
+            <ScrollReveal
+              key={job.company}
+              delay={i * 80}
+              className="pb-12 last:pb-0"
+            >
               <div className="relative pb-16 last:pb-0">
                 {/* dot */}
                 <span className="absolute -left-11.25 top-2 h-3.5 w-3.5 rounded-full border-2 border-(--lagoon) bg-(--bg-base)" />
 
-                <span className="font-mono text-xs font-medium tracking-wide text-(--sea-ink-soft)">{job.period}</span>
+                <span className="font-mono text-xs font-medium tracking-wide text-(--sea-ink-soft)">
+                  {job.period}
+                </span>
                 <h3 className="mt-2 flex items-center gap-2 text-xl font-bold text-(--sea-ink)">
                   <Briefcase className="h-4 w-4 shrink-0 text-(--lagoon)" />
                   {job.role}
@@ -416,7 +631,9 @@ function App() {
                 <p className="mt-1 text-sm font-semibold text-(--lagoon-deep)">
                   {job.company} &middot; {job.location}
                 </p>
-                <p className="mt-4 max-w-[62ch] text-sm leading-relaxed text-(--sea-ink-soft)">{job.description}</p>
+                <p className="mt-4 max-w-[62ch] text-sm leading-relaxed text-(--sea-ink-soft)">
+                  {job.description}
+                </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {job.tech.map((t) => (
                     <span
@@ -436,7 +653,11 @@ function App() {
       {/* ══ SKILLS ═══════════════════════════════════════════════════════ */}
       <Section id="skills">
         <ScrollReveal>
-          <SectionHeader eyebrow="Expertise" title="Technical Skills"  className='pb-8'/>
+          <SectionHeader
+            eyebrow="Expertise"
+            title="Technical Skills"
+            className="pb-8"
+          />
         </ScrollReveal>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -468,7 +689,11 @@ function App() {
       {/* ══ EDUCATION ════════════════════════════════════════════════════ */}
       <Section id="education">
         <ScrollReveal>
-          <SectionHeader eyebrow="Academic Background" title="Education" className="pb-8"/>
+          <SectionHeader
+            eyebrow="Academic Background"
+            title="Education"
+            className="pb-8"
+          />
         </ScrollReveal>
 
         <ScrollReveal delay={80} className="max-w-2xl">
@@ -478,20 +703,30 @@ function App() {
                 <GraduationCap className="h-6 w-6" />
               </span>
               <div className="space-y-1.5">
-                <span className="font-mono text-xs text-(--sea-ink-soft)">September 2019 – June 2023</span>
+                <span className="font-mono text-xs text-(--sea-ink-soft)">
+                  September 2019 – June 2023
+                </span>
                 <h3 className="text-lg font-bold leading-snug text-(--sea-ink)">
                   BSc Electrical &amp; Computer Engineering (Honours)
                 </h3>
                 <p className="text-sm font-semibold text-(--lagoon-deep)">
-                  The University of the West Indies, St. Augustine &middot; Trinidad and Tobago
+                  The University of the West Indies, St. Augustine &middot;
+                  Trinidad and Tobago
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-(--sea-ink-soft)">
-                  Four-year honours programme covering digital systems design, embedded computing, software
-                  engineering principles, signal processing, and advanced mathematics — providing a rigorous
-                  foundation for systems-level and full-stack software development.
+                  Four-year honours programme covering digital systems design,
+                  embedded computing, software engineering principles, signal
+                  processing, and advanced mathematics — providing a rigorous
+                  foundation for systems-level and full-stack software
+                  development.
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  {['Digital Systems', 'Embedded Computing', 'Software Engineering', 'Signal Processing'].map((tag) => (
+                  {[
+                    'Digital Systems',
+                    'Embedded Computing',
+                    'Software Engineering',
+                    'Signal Processing',
+                  ].map((tag) => (
                     <span
                       key={tag}
                       className="rounded-full border border-(--line) bg-(--fg-soft) px-2.5 py-0.5 text-xs font-medium text-(--sea-ink-soft)"
@@ -510,12 +745,17 @@ function App() {
       <Section id="projects">
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between pb-8">
           <ScrollReveal>
-            <SectionHeader eyebrow="Work Showcase" title="Projects"/>
+            <SectionHeader eyebrow="Work Showcase" title="Projects" />
           </ScrollReveal>
           <ScrollReveal delay={80}>
             <div className="flex self-start rounded-lg border border-(--line) bg-(--surface2) p-1">
               {(['all', 'web', 'games'] as Filter[]).map((f) => (
-                <FilterBtn key={f} label={f} active={activeFilter === f} onClick={() => setActiveFilter(f)} />
+                <FilterBtn
+                  key={f}
+                  label={f}
+                  active={activeFilter === f}
+                  onClick={() => setActiveFilter(f)}
+                />
               ))}
             </div>
           </ScrollReveal>
@@ -532,19 +772,26 @@ function App() {
                   </div>
                   <div className="flex flex-1 flex-col gap-3 p-5">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-(--sea-ink)">{project.title}</h3>
+                      <h3 className="font-bold text-(--sea-ink)">
+                        {project.title}
+                      </h3>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="rounded-full bg-(--accent-soft) px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-(--lagoon)">
                           {project.badge}
                         </span>
                         {project.link && project.link !== '#' && (
-                          <a href={project.link} className="text-(--lagoon) transition hover:text-(--lagoon-deep)">
+                          <a
+                            href={project.link}
+                            className="text-(--lagoon) transition hover:text-(--lagoon-deep)"
+                          >
                             <ExternalLink className="h-4 w-4" />
                           </a>
                         )}
                       </div>
                     </div>
-                    <p className="flex-1 text-sm leading-relaxed text-(--sea-ink-soft)">{project.description}</p>
+                    <p className="flex-1 text-sm leading-relaxed text-(--sea-ink-soft)">
+                      {project.description}
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       {project.tech.map((t) => (
                         <span
@@ -569,29 +816,50 @@ function App() {
           {/* contact info */}
           <ScrollReveal className="md:col-span-2 space-y-8">
             <div>
-              <SectionHeader eyebrow="Collaboration" title="Let's build something exceptional together." className='pb-2.5'/>
+              <SectionHeader
+                eyebrow="Collaboration"
+                title="Let's build something exceptional together."
+                className="pb-2.5"
+              />
               <p className="text-sm leading-relaxed text-(--sea-ink-soft)">
-                Open to discussing new engineering roles, backend architecture challenges, frontend designs,
-                or contract positions. Leave a message or reach out directly!
+                Open to discussing new engineering roles, backend architecture
+                challenges, frontend designs, or contract positions. Leave a
+                message or reach out directly!
               </p>
             </div>
 
             <div>
               {[
-                { icon: Mail, value: 'amgookool@gmail.com', href: 'mailto:amgookool@gmail.com' },
-                { icon: Phone, value: '+1 (868) 475-5372', href: 'tel:+18684755372' },
+                {
+                  icon: Mail,
+                  value: 'amgookool@gmail.com',
+                  href: 'mailto:amgookool@gmail.com',
+                },
+                {
+                  icon: Phone,
+                  value: '+1 (868) 475-5372',
+                  href: 'tel:+18684755372',
+                },
                 { icon: MapPin, value: 'Trinidad & Tobago', href: undefined },
               ].map((item) => (
-                <div key={item.value} className="flex items-center gap-3 border-b border-(--line) py-3.5 last:border-0">
+                <div
+                  key={item.value}
+                  className="flex items-center gap-3 border-b border-(--line) py-3.5 last:border-0"
+                >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-(--line) bg-(--chip-bg) text-(--lagoon)">
                     <item.icon className="h-4 w-4" />
                   </span>
                   {item.href ? (
-                    <a href={item.href} className="text-sm font-medium text-(--sea-ink-soft) transition hover:text-(--lagoon-deep)">
+                    <a
+                      href={item.href}
+                      className="text-sm font-medium text-(--sea-ink-soft) transition hover:text-(--lagoon-deep)"
+                    >
                       {item.value}
                     </a>
                   ) : (
-                    <span className="text-sm font-medium text-(--sea-ink-soft)">{item.value}</span>
+                    <span className="text-sm font-medium text-(--sea-ink-soft)">
+                      {item.value}
+                    </span>
                   )}
                 </div>
               ))}
@@ -607,9 +875,12 @@ function App() {
                     <CheckCircle2 className="h-7 w-7" />
                   </span>
                   <div>
-                    <h3 className="text-xl font-bold text-(--sea-ink)">Message Sent!</h3>
+                    <h3 className="text-xl font-bold text-(--sea-ink)">
+                      Message Sent!
+                    </h3>
                     <p className="mt-1.5 text-sm text-(--sea-ink-soft)">
-                      Thank you for reaching out — I&rsquo;ll get back to you as soon as possible.
+                      Thank you for reaching out — I&rsquo;ll get back to you as
+                      soon as possible.
                     </p>
                   </div>
                   <button
@@ -621,7 +892,9 @@ function App() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <h3 className="mb-2 text-lg font-bold text-(--sea-ink) pb-2">Send a Message</h3>
+                  <h3 className="mb-2 text-lg font-bold text-(--sea-ink) pb-2">
+                    Send a Message
+                  </h3>
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="field">
                       <label htmlFor="name">Your Name</label>
@@ -630,7 +903,9 @@ function App() {
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
                         className="input"
                         placeholder="Adrian Gookool"
                       />
@@ -642,7 +917,9 @@ function App() {
                         type="email"
                         required
                         value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
                         className="input"
                         placeholder="you@example.com"
                       />
@@ -655,7 +932,9 @@ function App() {
                       required
                       rows={5}
                       value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, message: e.target.value })
+                      }
                       className="textarea"
                       placeholder="Hi Adrian, let's collaborate on..."
                     />
