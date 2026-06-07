@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "amgookool-portfolio"
+  },
+  "targets": {},
+  "etags": {
+    "amgookool-portfolio": {
+      "extensionInstances": {
+        "firestore-send-email": "409aab0a83d5dc0381a169c00bb55b220e4e7f40ceb147e8a93f1419333f08bd"
+      }
+    }
   }
 }
