@@ -1,0 +1,269 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* ── design tokens ──────────────────────────────────────────────── */
+:root {
+  /* backgrounds */
+  --bg-base:        oklch(98.5% 0.003 240);
+  --surface:        oklch(100% 0 0);
+  --surface2:       oklch(97% 0.004 240);
+  --surface-strong: oklch(100% 0 0);
+  --sand:           oklch(97% 0.004 240);
+  --foam:           oklch(98.5% 0.003 240);
+
+  /* text */
+  --sea-ink:       oklch(16% 0.015 255);
+  --sea-ink-soft:  oklch(52% 0.014 250);
+
+  /* accent */
+  --lagoon:        oklch(60% 0.18 195);
+  --lagoon-deep:   oklch(52% 0.20 195);
+
+  /* accent2 (blue-purple, for secondary pills / gradients) */
+  --lagoon2:       oklch(68% 0.15 265);
+
+  /* borders */
+  --line:          oklch(91% 0.006 250);
+  --inset-glint:   oklch(96% 0 0);
+
+  /* derived tints */
+  --accent-soft:   color-mix(in oklch, var(--lagoon) 10%, transparent);
+  --accent-mid:    color-mix(in oklch, var(--lagoon) 20%, transparent);
+  --accent2-soft:  color-mix(in oklch, var(--lagoon2) 10%, transparent);
+  --fg-soft:       color-mix(in oklch, var(--sea-ink) 6%, transparent);
+
+  /* semantic ui */
+  --kicker:        oklch(60% 0.18 195);
+  --header-bg:     color-mix(in oklch, oklch(98.5% 0.003 240) 85%, transparent);
+  --chip-bg:       oklch(97% 0.004 240);
+  --chip-line:     oklch(86% 0.009 250);
+  --link-bg-hover: oklch(95% 0.005 240);
+}
+
+[data-theme="dark"] {
+  --bg-base:        oklch(13% 0.007 240);
+  --surface:        oklch(17% 0.008 240);
+  --surface2:       oklch(20% 0.01 240);
+  --surface-strong: oklch(20% 0.01 240);
+  --sand:           oklch(20% 0.01 240);
+  --foam:           oklch(13% 0.007 240);
+  --sea-ink:        oklch(94% 0.005 240);
+  --sea-ink-soft:   oklch(60% 0.01 240);
+  --lagoon:         oklch(72% 0.16 195);
+  --lagoon-deep:    oklch(78% 0.15 195);
+  --lagoon2:        oklch(75% 0.14 265);
+  --line:           oklch(22% 0.012 240);
+  --inset-glint:    oklch(24% 0.01 240);
+  --kicker:         oklch(72% 0.16 195);
+  --header-bg:      color-mix(in oklch, oklch(13% 0.007 240) 85%, transparent);
+  --chip-bg:        oklch(17% 0.008 240);
+  --chip-line:      oklch(26% 0.014 240);
+  --link-bg-hover:  oklch(20% 0.01 240);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-base:        oklch(13% 0.007 240);
+    --surface:        oklch(17% 0.008 240);
+    --surface2:       oklch(20% 0.01 240);
+    --surface-strong: oklch(20% 0.01 240);
+    --sand:           oklch(20% 0.01 240);
+    --foam:           oklch(13% 0.007 240);
+    --sea-ink:        oklch(94% 0.005 240);
+    --sea-ink-soft:   oklch(60% 0.01 240);
+    --lagoon:         oklch(72% 0.16 195);
+    --lagoon-deep:    oklch(78% 0.15 195);
+    --lagoon2:        oklch(75% 0.14 265);
+    --line:           oklch(22% 0.012 240);
+    --inset-glint:    oklch(24% 0.01 240);
+    --kicker:         oklch(72% 0.16 195);
+    --header-bg:      color-mix(in oklch, oklch(13% 0.007 240) 85%, transparent);
+    --chip-bg:        oklch(17% 0.008 240);
+    --chip-line:      oklch(26% 0.014 240);
+    --link-bg-hover:  oklch(20% 0.01 240);
+  }
+}
+
+/* ── reset ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body, #app { min-height: 100%; }
+
+body {
+  background: var(--bg-base);
+  color: var(--sea-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::selection {
+  background: color-mix(in oklch, var(--lagoon) 24%, transparent);
+}
+
+img, svg { display: block; max-width: 100%; }
+
+a {
+  color: var(--lagoon-deep);
+  text-decoration-color: color-mix(in oklch, var(--lagoon-deep) 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover { color: var(--lagoon); }
+
+code {
+  font-size: 0.9em;
+  border: 1px solid var(--line);
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* ── layout ─────────────────────────────────────────────────────── */
+.page-wrap {
+  width: min(1080px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+/* ── typography ─────────────────────────────────────────────────── */
+.display-title { font-family: "Fraunces", Georgia, serif; }
+
+/* ── cards ──────────────────────────────────────────────────────── */
+.island-shell {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow:
+    0 1px 3px color-mix(in oklch, var(--sea-ink) 4%, transparent),
+    0 6px 24px color-mix(in oklch, var(--sea-ink) 5%, transparent);
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--lagoon) 40%, var(--line));
+  box-shadow:
+    0 1px 3px color-mix(in oklch, var(--sea-ink) 4%, transparent),
+    0 10px 36px color-mix(in oklch, var(--sea-ink) 8%, transparent);
+}
+
+/* ── eyebrow / kicker ───────────────────────────────────────────── */
+.island-kicker {
+  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--kicker);
+}
+
+/* ── nav links ──────────────────────────────────────────────────── */
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--sea-ink-soft);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.18s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--lagoon);
+  transition: transform 0.17s ease;
+}
+
+.nav-link:hover,
+.nav-link.is-active { color: var(--sea-ink); }
+
+.nav-link:hover::after,
+.nav-link.is-active::after { transform: scaleX(1); }
+
+@media (max-width: 640px) {
+  .nav-link::after { bottom: -4px; }
+}
+
+/* ── form elements ──────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sea-ink-soft);
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-base);
+  color: var(--sea-ink);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.input:focus, .textarea:focus {
+  border-color: var(--lagoon);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--lagoon) 18%, transparent);
+}
+
+.input::placeholder, .textarea::placeholder { color: var(--sea-ink-soft); opacity: 0.55; }
+
+.textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+
+/* ── footer ─────────────────────────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: var(--bg-base);
+}
+
+/* ── transition defaults ────────────────────────────────────────── */
+button, .island-shell, a {
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+    transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* ── entrance animation ─────────────────────────────────────────── */
+.rise-in {
+  animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,20 @@
+{
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "cSpell.words": [
+    "amgookool",
+    "firebaseapp",
+    "firebasestorage",
+    "firestore",
+    "RLNR",
+    "Thymeleaf",
+    "XTQYR"
+  ]
+}

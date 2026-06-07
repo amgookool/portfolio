@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Adrian Gookool - Portfolio",
+  "entry": "adrian-gookool-portfolio.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "primary": true,
+  "createdAt": "2026-06-07T02:34:29.869Z",
+  "updatedAt": "2026-06-07T02:34:29.874Z",
+  "sourceSkillId": "agent-browser",
+  "metadata": {
+    "identifier": "adrian-gookool-portfolio",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}
