@@ -2,10 +2,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import SkillsSection from './SkillsSection'
-import { SKILLS } from '#/data/skills'
 
-vi.mock('#/components/skills/SkillsGraph', () => ({
-  default: () => <div data-testid="skills-graph" />,
+vi.mock('#/components/skills/SkillsShowcase', () => ({
+  default: () => <div data-testid="skills-showcase" />,
 }))
 
 vi.mock('#/components/Section', () => ({
@@ -23,18 +22,13 @@ vi.mock('#/components/ScrollReveal', () => ({
 describe('SkillsSection', () => {
   afterEach(() => cleanup())
 
-  it('renders the SkillsGraph canvas', () => {
+  it('renders the section heading', () => {
     render(<SkillsSection />)
-    expect(screen.getByTestId('skills-graph')).toBeTruthy()
+    expect(screen.getByText('Technical Skills')).toBeTruthy()
   })
 
-  it('renders a hidden accessibility list with all skills', () => {
+  it('renders the skills showcase', () => {
     render(<SkillsSection />)
-    const list = screen.getByRole('list', { hidden: true, name: 'Technical skills' })
-    expect(list).toBeTruthy()
-    expect(screen.getByText('TypeScript')).toBeTruthy()
-    expect(screen.getByText('Rust')).toBeTruthy()
-    expect(screen.getByText('Firebase')).toBeTruthy()
-    expect(screen.getAllByRole('listitem', { hidden: true }).length).toBe(SKILLS.length)
+    expect(screen.getByTestId('skills-showcase')).toBeTruthy()
   })
 })
