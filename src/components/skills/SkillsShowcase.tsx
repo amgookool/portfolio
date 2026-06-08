@@ -1,8 +1,10 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
 import type { Variants } from 'framer-motion'
 import { SKILLS, SKILL_CATEGORIES, CATEGORY_LABELS } from '#/data/skills'
 import type { Skill, SkillCategory } from '#/data/skills'
+import SkillsLayerProvider from './SkillsCanvas'
+import SkillMarker from './SkillMarker'
 
 // ── per-category editorial metadata ───────────────────────────────────────────
 
@@ -55,17 +57,18 @@ const pillVariants: Variants = {
 // ── skill pill ────────────────────────────────────────────────────────────────
 
 function SkillPill({ skill, accent }: { skill: Skill; accent: string }) {
+  const [hovered, setHovered] = useState(false)
+
   return (
     <motion.li variants={pillVariants} className="contents">
       <motion.span
         whileHover={{ y: -3, scale: 1.05 }}
+        onHoverStart={() => setHovered(true)}
+        onHoverEnd={() => setHovered(false)}
         transition={{ type: 'spring', stiffness: 420, damping: 22 }}
         className="group inline-flex cursor-default items-center gap-2 rounded-full border border-(--line) bg-(--surface) py-1.5 pr-4 pl-3 text-sm font-medium text-(--sea-ink) shadow-sm transition-colors duration-150 hover:border-(--pill-accent) hover:text-(--pill-accent)"
       >
-        <span
-          className="size-1.5 rounded-full transition-transform duration-150 group-hover:scale-150"
-          style={{ backgroundColor: accent }}
-        />
+        <SkillMarker skill={skill} accent={accent} hovered={hovered} />
         {skill.name}
       </motion.span>
     </motion.li>
@@ -151,10 +154,12 @@ function CategoryRow({ category }: { category: SkillCategory }) {
 
 export default function SkillsShowcase() {
   return (
-    <div className="divide-y divide-(--line)" aria-label="Technical skills">
-      {SKILL_CATEGORIES.map((category) => (
-        <CategoryRow key={category} category={category} />
-      ))}
-    </div>
+    <SkillsLayerProvider>
+      <div className="divide-y divide-(--line)" aria-label="Technical skills">
+        {SKILL_CATEGORIES.map((category) => (
+          <CategoryRow key={category} category={category} />
+        ))}
+      </div>
+    </SkillsLayerProvider>
   )
 }
