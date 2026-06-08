@@ -1,23 +1,11 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { resolveCssColor } from '#/utils/theme'
 
 const COUNT = 180
 const CONNECT_DIST = 1.1
 const CONNECT_DIST_SQ = CONNECT_DIST * CONNECT_DIST
 const MAX_SEGS = 1200
-
-// Resolve a CSS custom property (which may be oklch/color-mix/etc) to linear [0-1] RGB
-// by painting it into a 1×1 canvas and reading back the pixel.
-function resolveCssColor(cssVarName: string): [number, number, number] {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim()
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = 1
-  const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = raw
-  ctx.fillRect(0, 0, 1, 1)
-  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
-  return [r / 255, g / 255, b / 255]
-}
 
 export default function HeroCanvas() {
   const mountRef = useRef<HTMLDivElement>(null)

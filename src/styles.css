@@ -27,6 +27,10 @@
   /* accent2 (blue-purple, for secondary pills / gradients) */
   --lagoon2:       oklch(68% 0.15 265);
 
+  /* accent3 (amber, for infrastructure category) */
+  --amber:         oklch(75% 0.16 70);
+  --amber-soft:    color-mix(in oklch, var(--amber) 10%, transparent);
+
   /* borders */
   --line:          oklch(91% 0.006 250);
   --inset-glint:   oklch(96% 0 0);
@@ -57,6 +61,7 @@
   --lagoon:         oklch(72% 0.16 195);
   --lagoon-deep:    oklch(78% 0.15 195);
   --lagoon2:        oklch(75% 0.14 265);
+  --amber:          oklch(80% 0.15 70);
   --line:           oklch(22% 0.012 240);
   --inset-glint:    oklch(24% 0.01 240);
   --kicker:         oklch(72% 0.16 195);
@@ -79,6 +84,7 @@
     --lagoon:         oklch(72% 0.16 195);
     --lagoon-deep:    oklch(78% 0.15 195);
     --lagoon2:        oklch(75% 0.14 265);
+    --amber:          oklch(80% 0.15 70);
     --line:           oklch(22% 0.012 240);
     --inset-glint:    oklch(24% 0.01 240);
     --kicker:         oklch(72% 0.16 195);
