@@ -152,17 +152,17 @@ function JobCard({ job, index }: { job: (typeof jobs)[0]; index: number }) {
             {job.period}
           </span>
           <h3 className="mt-2 flex items-center gap-2 text-xl font-bold text-(--sea-ink)">
-            <Briefcase className="h-4 w-4 shrink-0 text-(--lagoon)" />
+            <Briefcase className="size-4.5 shrink-0 text-(--lagoon) mt-0.5" />
             {job.role}
           </h3>
-          <p className="mt-1 text-sm font-semibold text-(--lagoon-deep)">
+          <p className="mt-1 text-sm/relaxed font-semibold text-(--lagoon-deep)">
             {job.company} &middot; {job.location}
           </p>
-          <p className="mt-4 max-w-[62ch] text-sm leading-relaxed text-(--sea-ink-soft)">
+          <p className="mt-4 pt-1  max-w-[63ch] text-sm leading-relaxed text-(--sea-ink-soft)">
             {job.description}
           </p>
           <motion.div
-            className="mt-5 flex flex-wrap gap-2"
+            className="mt-5 flex flex-wrap gap-x-2 pt-1.5 "
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '0px 0px -40px 0px' }}
