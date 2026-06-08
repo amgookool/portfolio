@@ -1160,7 +1160,7 @@ export default function SkillsGraph() {
   }, [])
 
   return (
-    <div ref={containerRef} className="w-full h-[420px] md:h-[600px]">
+    <div ref={containerRef} className="w-full h-105 md:h-150">
       <Canvas
         camera={{ position: [0, 0, 18], fov: 60 }}
         gl={{ alpha: true, antialias: true }}
