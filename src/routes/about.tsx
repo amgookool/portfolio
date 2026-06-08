@@ -15,7 +15,7 @@ function About() {
           Believer in good architecture, design, and scalability.
         </h1>
         
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3 pt-1.5">
           <div className="md:col-span-2 space-y-6 text-base leading-relaxed text-(--sea-ink-soft)">
             <p>
               I am a passionate software engineer dedicated to building scalable, efficient, and reliable software solutions that solve real-world problems. With experience across the full stack—ranging from backend services in Node.js and Spring Boot to modern frontend frameworks like React, Svelte, and Angular—I enjoy taking ideas from concept to production.
@@ -28,7 +28,7 @@ function About() {
             </p>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-6 gap-2.5 flex flex-col">
             <div className="rounded-2xl border border-(--line) bg-white/20 p-6 backdrop-blur-sm">
               <h3 className="text-sm font-bold uppercase tracking-wider text-(--kicker) mb-4">Contact Info</h3>
               <ul className="space-y-3 text-sm text-(--sea-ink-soft)">

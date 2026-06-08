@@ -24,7 +24,7 @@ export default function ContactSection() {
   const [formError, setFormError] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!(formData.name && formData.email && formData.message)) return
 
