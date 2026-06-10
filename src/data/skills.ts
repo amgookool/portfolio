@@ -124,7 +124,7 @@ export const SKILLS: Skill[] = [
     name: 'Express',
     shortName: 'Expr',
     category: 'frameworks',
-    glbPath: null,
+    glbPath: '/3d/express-logo.glb',
   },
   {
     id: 'springboot',
