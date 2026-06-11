@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --no-pager log --oneline -15)",
+      "Bash(git --no-pager diff --stat HEAD~4 HEAD)",
+      "Bash(sleep 2; cat /private/tmp/claude-501/-Users-adrian-Development-amgookool-portfolio/b1c9fb41-53bd-4857-9022-3b9ec31256b4/tasks/bhb0k87wa.output 2>/dev/null; echo \"=== server log ===\"; cat /tmp/portfolio-server.log 2>/dev/null)",
+      "Read(//private/tmp/**)",
+      "Bash(pnpm install *)",
+      "Bash(pkill -f \"server/index.mjs\")",
+      "Bash(pkill -f \"probe-fetch\")"
+    ]
+  }
+}
