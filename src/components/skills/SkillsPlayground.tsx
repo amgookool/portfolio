@@ -278,13 +278,18 @@ function Lagoon({
         if (inFocus) {
           b.vel.addScaledVector(b.pos, -FOCUS_PULL * dt)
         } else if (filtered) {
-          // Nudge the off-category buoys out toward the rim.
-          scratch.n.copy(b.pos)
-          if (scratch.n.lengthSq() < 0.01)
-            scratch.n.set(Math.cos(b.phase), Math.sin(b.phase), 0)
-          const rim = Math.min(boundX, boundY) * 0.92
-          const off = rim - scratch.n.length()
-          b.vel.addScaledVector(scratch.n.normalize(), off * EXILE_PUSH * dt)
+          // Park off-category buoys in the pockets along the pool's longer
+          // axis so they sit well clear of the focused cluster in the middle.
+          const sideways = boundX >= boundY
+          const axis = sideways ? b.pos.x : b.pos.y
+          const side =
+            Math.abs(axis) > 0.2 ? Math.sign(axis) : b.phase > Math.PI ? 1 : -1
+          const edge = (sideways ? boundX : boundY) * 0.82 * side
+          if (sideways) {
+            b.vel.x += (edge - b.pos.x) * EXILE_PUSH * dt
+          } else {
+            b.vel.y += (edge - b.pos.y) * EXILE_PUSH * dt
+          }
         } else {
           b.vel.addScaledVector(b.pos, -CENTER_PULL * dt)
         }
@@ -325,7 +330,7 @@ function Lagoon({
       }
 
       // Scale target: focused buoys swell, exiled ones shrink, hover perks up.
-      let target = filtered ? (inFocus ? 1.18 : 0.62) : 1
+      let target = filtered ? (inFocus ? 1.18 : 0.48) : 1
       if (isHovered || isDragged) target *= 1.22
       b.scale = THREE.MathUtils.lerp(b.scale, target, 1 - Math.exp(-8 * dt))
     }
@@ -426,9 +431,32 @@ function CurrentChip({
 
 // ── playground shell ──────────────────────────────────────────────────────────
 
+// Client + WebGL + motion-ok check, shared with the showcase so it can hide
+// the playground view entirely where it can't render.
+export function usePlaygroundSupported() {
+  const [supported, setSupported] = useState(false)
+  useEffect(() => {
+    if (
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function'
+    )
+      return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    try {
+      const probe = document.createElement('canvas')
+      if (!probe.getContext('webgl2') && !probe.getContext('webgl')) return
+    } catch {
+      return
+    }
+    setSupported(true)
+  }, [])
+  return supported
+}
+
 export default function SkillsPlayground() {
   const panelRef = useRef<HTMLDivElement>(null)
-  const [ready, setReady] = useState(false) // client + WebGL + near viewport
+  const supported = usePlaygroundSupported()
+  const [ready, setReady] = useState(false) // supported + near viewport
   const [hovered, setHovered] = useState<Skill | null>(null)
   const [filter, setFilter] = useState<SkillCategory | null>(null)
 
@@ -448,21 +476,9 @@ export default function SkillsPlayground() {
   )
   shared.filter = filter
 
-  // Mount the canvas only client-side, with WebGL, once the panel approaches
-  // the viewport. Reduced-motion users keep the (already rich) pill rows only.
+  // Mount the canvas only once the panel approaches the viewport.
   useEffect(() => {
-    if (
-      typeof window === 'undefined' ||
-      typeof window.matchMedia !== 'function'
-    )
-      return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    try {
-      const probe = document.createElement('canvas')
-      if (!probe.getContext('webgl2') && !probe.getContext('webgl')) return
-    } catch {
-      return
-    }
+    if (!supported) return
     const el = panelRef.current
     if (!el || typeof IntersectionObserver === 'undefined') {
       setReady(true)
@@ -479,7 +495,7 @@ export default function SkillsPlayground() {
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [supported])
 
   return (
     <div ref={panelRef} className="mb-4">
