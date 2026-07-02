@@ -1,15 +1,14 @@
-import { useRef, useState } from 'react'
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useMotionTemplate,
-} from 'framer-motion'
+import { useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
 import type { Variants } from 'framer-motion'
 import { Rows3, Sparkles } from 'lucide-react'
 import { SKILLS, SKILL_CATEGORIES, CATEGORY_LABELS } from '#/data/skills'
 import type { Skill, SkillCategory } from '#/data/skills'
-import SkillsLayerProvider from './SkillsCanvas'
+import SkillsLayerProvider, {
+  SkillsLayerContext,
+  useSkillsLayer,
+} from './SkillsCanvas'
 import SkillMarker from './SkillMarker'
 import SkillsPlayground, { usePlaygroundSupported } from './SkillsPlayground'
 
@@ -224,12 +223,59 @@ function ViewToggle({
   )
 }
 
+// ── marker layer gate ─────────────────────────────────────────────────────────
+
+// The pill markers draw into a shared fixed-position canvas that sits outside
+// the view wrappers, so hiding the list's DOM doesn't hide its 3D logos. This
+// gate flips the layer context off while the list view is hidden, dropping
+// every marker back to its dot (and unmounting its <View> from the shared
+// canvas). GLBs stay cached, so re-showing the list is instant.
+function MarkerLayerGate({
+  enabled,
+  children,
+}: {
+  enabled: boolean
+  children: ReactNode
+}) {
+  const parent = useSkillsLayer()
+  const value = useMemo(
+    () => ({ active: parent.active && enabled }),
+    [parent.active, enabled],
+  )
+  return (
+    <SkillsLayerContext.Provider value={value}>
+      {children}
+    </SkillsLayerContext.Provider>
+  )
+}
+
 // ── showcase ──────────────────────────────────────────────────────────────────
+
+// Both views stay mounted so the playground's WebGL canvas (and its uploaded
+// GLB assets) survives toggling; the inactive view is faded out, made inert,
+// and pulled out of the layout as an absolutely-positioned overlay.
+const viewVariants: Variants = {
+  visible: {
+    opacity: 1,
+    y: 0,
+    display: 'block',
+    transition: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+  },
+  hidden: {
+    opacity: 0,
+    y: 10,
+    transition: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+    transitionEnd: { display: 'none' },
+  },
+}
+
+const HIDDEN_VIEW_CLASS = 'pointer-events-none absolute inset-0 overflow-hidden'
 
 export default function SkillsShowcase() {
   const playgroundSupported = usePlaygroundSupported()
   const [view, setView] = useState<SkillsView>('playground')
   const activeView: SkillsView = playgroundSupported ? view : 'list'
+  const playgroundActive = activeView === 'playground'
 
   return (
     <SkillsLayerProvider>
@@ -238,28 +284,35 @@ export default function SkillsShowcase() {
           <ViewToggle view={activeView} onChange={setView} />
         </div>
       )}
-      <AnimatePresence mode="wait" initial={false}>
+      <div className="relative">
+        {playgroundSupported && (
+          <motion.div
+            variants={viewVariants}
+            initial={false}
+            animate={playgroundActive ? 'visible' : 'hidden'}
+            inert={!playgroundActive}
+            className={playgroundActive ? undefined : HIDDEN_VIEW_CLASS}
+          >
+            <SkillsPlayground paused={!playgroundActive} />
+          </motion.div>
+        )}
         <motion.div
-          key={activeView}
-          initial={{ opacity: 0, y: 14, scale: 0.99 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.99 }}
-          transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+          variants={viewVariants}
+          initial={false}
+          animate={playgroundActive ? 'hidden' : 'visible'}
+          inert={playgroundActive}
+          className={playgroundActive ? HIDDEN_VIEW_CLASS : undefined}
+          aria-label="Technical skills"
         >
-          {activeView === 'playground' ? (
-            <SkillsPlayground />
-          ) : (
-            <div
-              className="divide-y divide-(--line)"
-              aria-label="Technical skills"
-            >
+          <MarkerLayerGate enabled={!playgroundActive}>
+            <div className="divide-y divide-(--line)">
               {SKILL_CATEGORIES.map((category) => (
                 <CategoryRow key={category} category={category} />
               ))}
             </div>
-          )}
+          </MarkerLayerGate>
         </motion.div>
-      </AnimatePresence>
+      </div>
     </SkillsLayerProvider>
   )
 }

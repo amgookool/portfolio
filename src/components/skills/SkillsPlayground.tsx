@@ -453,7 +453,13 @@ export function usePlaygroundSupported() {
   return supported
 }
 
-export default function SkillsPlayground() {
+// `paused` halts the render/physics loop while the playground is hidden behind
+// the list view, without tearing down the WebGL context or uploaded assets.
+export default function SkillsPlayground({
+  paused = false,
+}: {
+  paused?: boolean
+}) {
   const panelRef = useRef<HTMLDivElement>(null)
   const supported = usePlaygroundSupported()
   const [ready, setReady] = useState(false) // supported + near viewport
@@ -542,6 +548,7 @@ export default function SkillsPlayground() {
             }}
           >
             <Canvas
+              frameloop={paused ? 'never' : 'always'}
               dpr={[1, 2]}
               gl={{ antialias: true, alpha: true }}
               camera={{ position: [0, 0, 14], fov: 38 }}
