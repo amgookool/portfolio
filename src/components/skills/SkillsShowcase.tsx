@@ -5,6 +5,7 @@ import { SKILLS, SKILL_CATEGORIES, CATEGORY_LABELS } from '#/data/skills'
 import type { Skill, SkillCategory } from '#/data/skills'
 import SkillsLayerProvider from './SkillsCanvas'
 import SkillMarker from './SkillMarker'
+import SkillsPlayground from './SkillsPlayground'
 
 // ── per-category editorial metadata ───────────────────────────────────────────
 
@@ -33,8 +34,19 @@ const CATEGORY_META: Record<
 }
 
 const COUNT_WORDS = [
-  'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight',
-  'Nine', 'Ten', 'Eleven', 'Twelve',
+  'Zero',
+  'One',
+  'Two',
+  'Three',
+  'Four',
+  'Five',
+  'Six',
+  'Seven',
+  'Eight',
+  'Nine',
+  'Ten',
+  'Eleven',
+  'Twelve',
 ]
 
 // ── motion variants ───────────────────────────────────────────────────────────
@@ -155,6 +167,7 @@ function CategoryRow({ category }: { category: SkillCategory }) {
 export default function SkillsShowcase() {
   return (
     <SkillsLayerProvider>
+      <SkillsPlayground />
       <div className="divide-y divide-(--line)" aria-label="Technical skills">
         {SKILL_CATEGORIES.map((category) => (
           <CategoryRow key={category} category={category} />
