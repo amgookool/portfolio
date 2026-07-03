@@ -9,7 +9,15 @@ const SETTLE = 0.18 // scale lerp factor toward target
 
 // ── model: normalized, spins + grows on hover ────────────────────────────────
 
-function Model({ url, hovered }: { url: string; hovered: boolean }) {
+function Model({
+  url,
+  hovered,
+  scale = 1,
+}: {
+  url: string
+  hovered: boolean
+  scale?: number
+}) {
   const { scene } = useGLTF(url)
   const invalidate = useThree((s) => s.invalidate)
   const spinRef = useRef<THREE.Group>(null)
@@ -17,13 +25,14 @@ function Model({ url, hovered }: { url: string; hovered: boolean }) {
   // Clone so each pill gets its own instance (useGLTF caches the source scene).
   const model = useMemo(() => scene.clone(true), [scene])
 
-  // Normalize wildly-different GLB sizes to ~1 unit so framing is consistent.
+  // Normalize wildly-different GLB sizes to ~1 unit so framing is consistent,
+  // then apply the optional per-skill multiplier for aspect-ratio outliers.
   const fit = useMemo(() => {
     const box = new THREE.Box3().setFromObject(model)
     const size = box.getSize(new THREE.Vector3())
     const max = Math.max(size.x, size.y, size.z) || 1
-    return 1 / max
-  }, [model])
+    return (1 / max) * scale
+  }, [model, scale])
 
   // Render once when the model becomes available (frameloop is "demand").
   useEffect(() => invalidate(), [model, invalidate])
@@ -63,9 +72,11 @@ function Model({ url, hovered }: { url: string; hovered: boolean }) {
 export default function SkillLogoView({
   glbPath,
   hovered,
+  scale,
 }: {
   glbPath: string
   hovered: boolean
+  scale?: number
 }) {
   return (
     <View
@@ -79,7 +90,7 @@ export default function SkillLogoView({
       <directionalLight position={[2, 3, 4]} intensity={1.3} />
       <directionalLight position={[-3, -2, -1]} intensity={0.45} />
       <Suspense fallback={null}>
-        <Model url={glbPath} hovered={hovered} />
+        <Model url={glbPath} hovered={hovered} scale={scale} />
       </Suspense>
     </View>
   )

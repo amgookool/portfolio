@@ -6,6 +6,11 @@ export type Skill = {
   shortName: string
   category: SkillCategory
   glbPath: string | null
+  // Optional multiplier applied on top of the renderer's auto-normalization
+  // (which fits every logo to ~1 unit on its largest axis). Use it to nudge
+  // logos with an odd aspect ratio — e.g. the wide jQuery wordmark — so their
+  // visual weight matches the roughly-square icon logos. Defaults to 1.
+  scale?: number
 }
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
@@ -139,6 +144,9 @@ export const SKILLS: Skill[] = [
     shortName: 'jQ',
     category: 'frameworks',
     glbPath: '/3d/jquery-logo.glb',
+    // Wide wordmark: normalization fits its width to 1, leaving it short.
+    // Bump it so its height reads closer to the square icon logos.
+    scale: 2,
   },
   {
     id: 'tailwind',
