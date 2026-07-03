@@ -6,11 +6,15 @@ export type Skill = {
   shortName: string
   category: SkillCategory
   glbPath: string | null
-  // Optional multiplier applied on top of the renderer's auto-normalization
-  // (which fits every logo to ~1 unit on its largest axis). Use it to nudge
-  // logos with an odd aspect ratio — e.g. the wide jQuery wordmark — so their
-  // visual weight matches the roughly-square icon logos. Defaults to 1.
-  scale?: number
+  // Optional per-view multiplier applied on top of the renderer's
+  // auto-normalization (which fits every logo to ~1 unit on its largest axis).
+  // Nudges aspect-ratio outliers — e.g. the wide jQuery wordmark — so their
+  // visual weight matches the roughly-square icon logos. The two views frame
+  // logos differently, so each has its own knob; an omitted view defaults to 1.
+  scale?: {
+    list?: number // pill markers in the list view
+    playground?: number // floating buoys in the playground
+  }
 }
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
@@ -145,8 +149,9 @@ export const SKILLS: Skill[] = [
     category: 'frameworks',
     glbPath: '/3d/jquery-logo.glb',
     // Wide wordmark: normalization fits its width to 1, leaving it short.
-    // Bump it so its height reads closer to the square icon logos.
-    scale: 2,
+    // Bump it so its height reads closer to the square icon logos — tuned
+    // separately per view since they frame the logo at different sizes.
+    scale: { list: 2, playground: 1.5 },
   },
   {
     id: 'tailwind',

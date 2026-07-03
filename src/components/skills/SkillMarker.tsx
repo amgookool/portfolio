@@ -31,7 +31,7 @@ export default function SkillMarker({
       <SkillLogoView
         glbPath={skill.glbPath}
         hovered={hovered}
-        scale={skill.scale}
+        scale={skill.scale?.list}
       />
     )
   }

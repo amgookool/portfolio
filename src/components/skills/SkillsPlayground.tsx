@@ -86,17 +86,18 @@ function makeBodies(): Body[] {
 
 // ── buoy: one floating logo ───────────────────────────────────────────────────
 
-function BuoyModel({ url }: { url: string }) {
+function BuoyModel({ url, scale = 1 }: { url: string; scale?: number }) {
   const { scene } = useGLTF(url)
   const model = useMemo(() => scene.clone(true), [scene])
 
-  // Normalize wildly-different GLB sizes to a ~1 unit cube.
+  // Normalize wildly-different GLB sizes to a ~1 unit cube, then apply the
+  // optional per-skill multiplier for aspect-ratio outliers.
   const fit = useMemo(() => {
     const box = new THREE.Box3().setFromObject(model)
     const size = box.getSize(new THREE.Vector3())
     const max = Math.max(size.x, size.y, size.z) || 1
-    return 1 / max
-  }, [model])
+    return (1 / max) * scale
+  }, [model, scale])
 
   return (
     <Center scale={fit}>
@@ -140,7 +141,10 @@ function Buoy({
       }}
     >
       <Suspense fallback={null}>
-        <BuoyModel url={body.skill.glbPath!} />
+        <BuoyModel
+          url={body.skill.glbPath!}
+          scale={body.skill.scale?.playground}
+        />
       </Suspense>
     </group>
   )
