@@ -101,7 +101,7 @@ export default function EducationSection() {
             style={{ background: spotlight }}
           />
 
-          <div className="flex gap-5">
+          <div className="flex flex-col gap-5 sm:flex-row">
             {/* badge drifts independently — deeper parallax layer */}
             <motion.span
               style={{ x: iconX, y: iconY }}

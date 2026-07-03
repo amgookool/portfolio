@@ -27,7 +27,13 @@ export default function SkillMarker({
   const { active } = useSkillsLayer()
 
   if (active && skill.glbPath) {
-    return <SkillLogoView glbPath={skill.glbPath} hovered={hovered} />
+    return (
+      <SkillLogoView
+        glbPath={skill.glbPath}
+        hovered={hovered}
+        scale={skill.scale?.list}
+      />
+    )
   }
 
   return <SkillDot accent={accent} />

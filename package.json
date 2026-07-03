@@ -29,22 +29,22 @@
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-router-ssr-query": "latest",
     "@tanstack/react-start": "latest",
-    "@tanstack/router-plugin": "^1.132.0",
+    "@tanstack/router-plugin": "^1.168.18",
     "d3-force": "^3.0.0",
     "firebase": "^12.14.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^0.545.0",
-    "nitro": "npm:nitro-nightly@latest",
+    "nitro": "npm:nitro-nightly@3.0.1-20260605-145636-4ab22a9d",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18",
     "three": "^0.184.0"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/typography": "^0.5.20",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/eslint-config": "latest",
-    "@tanstack/router-cli": "^1.132.0",
+    "@tanstack/router-cli": "^1.167.17",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
     "@types/d3-force": "^3.0.10",
@@ -55,15 +55,12 @@
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.20.0",
     "jsdom": "^28.1.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.4",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
+
   }
 }

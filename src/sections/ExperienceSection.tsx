@@ -162,7 +162,7 @@ function JobCard({ job, index }: { job: (typeof jobs)[0]; index: number }) {
             {job.description}
           </p>
           <motion.div
-            className="mt-5 flex flex-wrap gap-x-2 pt-1.5 "
+            className="mt-5 flex flex-wrap gap-x-2 gap-y-1.5 pt-1.5 "
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '0px 0px -40px 0px' }}
