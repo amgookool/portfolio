@@ -8,6 +8,10 @@
       "Bash(pnpm install *)",
       "Bash(pkill -f \"server/index.mjs\")",
       "Bash(pkill -f \"probe-fetch\")"
+    ],
+    "additionalDirectories": [
+      "/tmp",
+      "/private/tmp"
     ]
   }
 }
